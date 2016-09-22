@@ -92,16 +92,16 @@ describe "The Tumblr API" do
     # Teardown: Delete the post (either via API or via UI automation)
     browser
     login
-    @driver.get "https://www.tumblr.com/new/text"
+    @driver.get url("/new/text")
     @driver.find_element(class: "post-form--form").find_element(class: "editor-plaintext").send_keys @post_title
     @driver.find_element(class: "post-form--form").find_element(class: "editor-richtext").send_keys @post_body
     @driver.find_element(class: "post-form--footer").find_element(class: "editor-plaintext").send_keys @tags
     @driver.find_element(class: "create_post_button").click
     sleep 1
-    @driver.get "http://#{@username}.tumblr.com/post/#{@post_title}"
+    @driver.get blog_url(@username, "/post/#{@post_title}")
     foo = @driver.page_source.match @post_body
     expect(foo.to_s).to include @post_body
-    @driver.get "https://www.tumblr.com/blog/#{@username}"
+    @driver.get url("/blog/#{@username}")
     @driver.find_element(class: "post_control_menu").click
     @driver.find_element(class: "delete").click
     @driver.find_element(class: "init_focus").find_element(class: "ui_button").click
@@ -116,7 +116,7 @@ describe "The Tumblr API" do
     # Teardown: Delete the post via API
     hello = @client.text("boldlyspookylady.tumblr.com", {:title => @post_title, :body => @post_body, :tags => @tags})
     @id = hello['id']
-    @driver.get "https://www.tumblr.com/blog/#{@username}"
+    @driver.get url("/blog/#{@username}")
     @driver.find_element(class: "post_control_menu").click
     @driver.find_element(class: "edit").click
     @driver.find_element(class: "post-form--footer").find_element(class: "editor-plaintext").send_keys "Edited\n"
@@ -135,7 +135,7 @@ describe "The Tumblr API" do
     # Assert that it's dissapeared from the dashboard
     # Assert that it's dissapeared from the front-end too
     @client.text("boldlyspookylady.tumblr.com", {:title => @post_title, :body => @post_body, :tags => @tags})
-    @driver.get "https://www.tumblr.com/blog/#{@username}"
+    @driver.get url("/blog/#{@username}")
     @driver.find_element(class: "post_control_menu").click
     @driver.find_element(class: "delete").click
     @driver.find_element(class: "init_focus").find_element(class: "ui_button").click
@@ -149,7 +149,7 @@ describe "The Tumblr API" do
     # Assert the new stuff exisits on the front-end
     # Teardown: Delete the post
     @client.text("boldlyspookylady.tumblr.com", {:title => @post_title, :body => @post_body, :tags => @tags})
-    @driver.get "https://www.tumblr.com/blog/#{@username}"
+    @driver.get url("/blog/#{@username}")
     @driver.find_element(class: "post_control_menu").click
     @driver.find_element(class: "edit").click
     @driver.find_element(class: "post-form--form").find_element(class: "editor-plaintext").send_keys "Edited"
@@ -181,7 +181,7 @@ describe "The Tumblr API" do
     elem = @driver.find_element(name: "photo")
     elem.sendKeys("./test-data/tumblr-test.jpg");
     @driver.find_element(class: "create_post_button").click
-    @driver.get "http://#{@username}.tumblr.com"
+    @driver.get blog_url(@username, "")
 
 
 

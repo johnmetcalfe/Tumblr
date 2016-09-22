@@ -17,8 +17,8 @@ def url(path)
   'https://www.tumblr.com' + path
 end
 
-def blog_url(username)
-  'http://' + username + '.tumblr.com'
+def blog_url(username, path)
+  'http://' + username + '.tumblr.com' + path
 end
 
 #def delete
