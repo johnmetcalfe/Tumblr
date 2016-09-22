@@ -32,8 +32,7 @@ end
 # end
 def login
  unless @driver.page_source.include? @username
-   @driver.find_element(id: "signup_determine_email").send_keys @email
-   @driver.find_element(class: "signup_determine_btn").click
+   @driver.find_element(id: "signup_determine_email").send_keys "#{@email}\n"
    password_el = @driver.find_element id: "signup_password"
    @driver.manage.timeouts.implicit_wait = 1
    password_el.send_keys "#{@password}\n"
