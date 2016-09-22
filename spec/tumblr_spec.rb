@@ -76,6 +76,7 @@ describe "The Tumblr API" do
   it 'should show an error on login with incorrect details' do
     # Try to log in with incorrect details via UI automation
     # Assert we see an error message and are still on login page via UI automation
+    broswer
     @driver.find_element(id: "signup_determine_email").send_keys "#{@email}\n"
     sleep 1
     @driver.find_element(id: "signup_password").send_keys "wrongpass\n"
@@ -114,6 +115,7 @@ describe "The Tumblr API" do
     # Edit the post and add some tags via UI automation
     # Assert that the tags show on the front end
     # Teardown: Delete the post via API
+    browser
     hello = @client.text("boldlyspookylady.tumblr.com", {:title => @post_title, :body => @post_body, :tags => @tags})
     @id = hello['id']
     @driver.get url("/blog/#{@username}")
@@ -134,6 +136,7 @@ describe "The Tumblr API" do
     # Delete the post via UI automation
     # Assert that it's dissapeared from the dashboard
     # Assert that it's dissapeared from the front-end too
+    browser
     @client.text("boldlyspookylady.tumblr.com", {:title => @post_title, :body => @post_body, :tags => @tags})
     @driver.get url("/blog/#{@username}")
     @driver.find_element(class: "post_control_menu").click
@@ -148,6 +151,7 @@ describe "The Tumblr API" do
     # Edit the post and achange the body and title via UI automation
     # Assert the new stuff exisits on the front-end
     # Teardown: Delete the post
+    browser
     @client.text("boldlyspookylady.tumblr.com", {:title => @post_title, :body => @post_body, :tags => @tags})
     @driver.get url("/blog/#{@username}")
     @driver.find_element(class: "post_control_menu").click
