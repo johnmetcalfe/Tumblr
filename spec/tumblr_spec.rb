@@ -45,10 +45,8 @@
 #
 #end
 describe "The Tumblr API" do
-  before(:each) do
-    @driver = Selenium::WebDriver.for :chrome
-    @url = "https://tumblr.com"
-    @driver.get @url
+  before(:all) do
+    browser
     @email = "seitgrads@mailinator.com"
     @password = "t3stacc0unt16"
     @username = "seitgrads16"
@@ -57,11 +55,8 @@ describe "The Tumblr API" do
   it 'should log in with correct details' do
     # Try to log in with correct details via UI automation
     # Assert we are on the dashboard via UI automation
-    @driver.find_element(id: "signup_login_button").click
-    @driver.find_element(id: "signup_determine_email").send_keys @email
-    @driver.find_element(id: "signup_forms_submit").click
-    sleep 1
-    @driver.find_element(id: "signup_password").send_keys @password
+    login
+
     dashboard = @driver.page_source.match @username
     expect(dashboard.to_s).to include @username
 
@@ -152,8 +147,18 @@ describe "The Tumblr API" do
     # Assert that the creation modal has gone away
     # Visit the front-end and check the post is displaying the correct image
     # Teardown: Delete the post (either via API or via UI automation)
+    login
+    @driver.find_element(id: "new_post_label_photo").click
+    elem = @driver.find_element(name: "photo")
+    elem.sendKeys("./test-data/tumblr-test.jpg");
+    @driver.find_element(class: "create_post_button").click
+    @driver.get "http://#{@username}.tumblr.com"
+
+
+
+
   end
-  after(:each) do
+  after(:all) do
 
       #@client.delete("boldlyspookylady.tumblr.com", @id)
       @driver.quit
