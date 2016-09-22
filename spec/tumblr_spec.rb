@@ -46,15 +46,20 @@
 #end
 describe "The Tumblr API" do
   before(:all) do
-    browser
     @email = "seitgrads@mailinator.com"
     @password = "t3stacc0unt16"
     @username = "seitgrads16"
+    @client = Tumblr::Client.new({
+          :consumer_key => '06ip5ssmlR1rl7WAZra4fMLnLgEcjXd1ukp510Z7XEOPi2Iu3l',
+          :consumer_secret => 'JpBIPNPEOaIzRObEv9TDkq5M6L4yXxGruiHeOF8Q3F3jc15WVZ',
+          :oauth_token => 'qfHtOWJ7lCBUv53z65cNPSQ5hsExO8ectMdPWXmKphRjPwTqmX',
+        })
   end
 
   it 'should log in with correct details' do
     # Try to log in with correct details via UI automation
     # Assert we are on the dashboard via UI automation
+    browser
     login
 
     dashboard = @driver.page_source.match @username
@@ -65,9 +70,7 @@ describe "The Tumblr API" do
   it 'should show an error on login with incorrect details' do
     # Try to log in with incorrect details via UI automation
     # Assert we see an error message and are still on login page via UI automation
-    @driver.find_element(id: "signup_login_button").click
-    @driver.find_element(id: "signup_determine_email").send_keys @email
-    @driver.find_element(id: "signup_forms_submit").click
+    @driver.find_element(id: "signup_determine_email").send_keys "#{@email}\n"
     sleep 1
     @driver.find_element(id: "signup_password").send_keys "wrongpass\n"
     error = @driver.page_source
@@ -81,6 +84,7 @@ describe "The Tumblr API" do
     # Assert that the creation modal has gone away
     # Visit the front-end and check the post is displaying the correct data
     # Teardown: Delete the post (either via API or via UI automation)
+    browser
     login
     @driver.get "https://www.tumblr.com/new/text"
     @driver.find_element(class: "post-form--form").find_element(class: "editor-plaintext").send_keys @post_title
@@ -91,17 +95,10 @@ describe "The Tumblr API" do
     @driver.get "http://#{@username}.tumblr.com/post/#{@post_title}"
     foo = @driver.page_source.match @post_body
     expect(foo.to_s).to include @post_body
-    delete_url = "https://www.tumblr.com/blog/#{@username}"
-    @driver.get delete_url
-    title_check = @driver.find_element class: "post_title"
-    post_item = @driver.find_element class: "post_control_menu"
-    post_item.click
-    delete = @driver.find_element class: "delete"
-    delete.click
-    delete_confirm_outer = @driver.find_element class: "init_focus"
-    delete_confirm = delete_confirm_outer.find_element class: "ui_button"
-    delete_confirm.click
-    exit
+    @driver.get "https://www.tumblr.com/blog/#{@username}"
+    @driver.find_element(class: "post_control_menu").click
+    @driver.find_element(class: "delete").click
+    @driver.find_element(class: "init_focus").find_element(class: "ui_button").click
 
   end
 
@@ -111,7 +108,14 @@ describe "The Tumblr API" do
     # Edit the post and add some tags via UI automation
     # Assert that the tags show on the front end
     # Teardown: Delete the post via API
-
+    hello = @client.text("boldlyspookylady.tumblr.com", {:title => @post_title, :body => @post_body, :tags => @tags})
+    @id = hello['id']
+    @driver.get "https://www.tumblr.com/blog/#{@username}"
+    @driver.find_element(class: "post_control_menu").click
+    @driver.find_element(class: "edit").click
+    @driver.find_element(class: "post-form--footer").find_element(class: "editor-plaintext").send_keys "Edited\n"
+    @driver.find_element(class: "create_post_button").click
+    @client.delete("#{@username}.tumblr.com", @id)
 
 
   end
@@ -124,6 +128,11 @@ describe "The Tumblr API" do
     # Delete the post via UI automation
     # Assert that it's dissapeared from the dashboard
     # Assert that it's dissapeared from the front-end too
+    @client.text("boldlyspookylady.tumblr.com", {:title => @post_title, :body => @post_body, :tags => @tags})
+    @driver.get "https://www.tumblr.com/blog/#{@username}"
+    @driver.find_element(class: "post_control_menu").click
+    @driver.find_element(class: "delete").click
+    @driver.find_element(class: "init_focus").find_element(class: "ui_button").click
   end
 
 
@@ -133,9 +142,21 @@ describe "The Tumblr API" do
     # Edit the post and achange the body and title via UI automation
     # Assert the new stuff exisits on the front-end
     # Teardown: Delete the post
+    @client.text("boldlyspookylady.tumblr.com", {:title => @post_title, :body => @post_body, :tags => @tags})
+    @driver.get "https://www.tumblr.com/blog/#{@username}"
+    @driver.find_element(class: "post_control_menu").click
+    @driver.find_element(class: "edit").click
+    @driver.find_element(class: "post-form--form").find_element(class: "editor-plaintext").send_keys "Edited"
+    @driver.find_element(class: "post-form--form").find_element(class: "editor-richtext").send_keys "Edited body"
+    @driver.find_element(class: "create_post_button").click
+    @driver.find_element(class: "post_control_menu").click
+    @driver.find_element(class: "delete").click
+    @driver.find_element(class: "init_focus").find_element(class: "ui_button").click
+
   end
 
   it 'should not allow me to post a text post without any inputs' do
+    browser
     login
     @driver.find_element(:class, "icon_post_text").click
     post_button = @driver.find_element(:class, "button-area").find_element(:class, "create_post_button").find_element(:class, "disabled")
@@ -148,6 +169,7 @@ describe "The Tumblr API" do
     # Assert that the creation modal has gone away
     # Visit the front-end and check the post is displaying the correct image
     # Teardown: Delete the post (either via API or via UI automation)
+    browser
     login
     @driver.find_element(id: "new_post_label_photo").click
     elem = @driver.find_element(name: "photo")
