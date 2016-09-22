@@ -135,10 +135,11 @@ describe "The Tumblr API" do
     # Teardown: Delete the post
   end
 
-  it 'should not allow me to post a text post without a title' do
-    # Setup: Login via helper method via UI automation
-    # Create a text post via UI automation, but leave the title blank
-    # Assert that the post button remains disabled
+  it 'should not allow me to post a text post without any inputs' do
+    login
+    @driver.find_element(:class, "icon_post_text").click
+    post_button = @driver.find_element(:class, "button-area").find_element(:class, "create_post_button").find_element(:class, "disabled")
+    assert(post_button)
   end
 
   it 'should post an image post' do
