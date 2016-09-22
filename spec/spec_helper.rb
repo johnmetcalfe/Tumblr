@@ -23,10 +23,30 @@ end
 #  delete_confirm = delete_confirm_outer.find_element class: "ui_button"
 #  delete_confirm.click
 #end
+# def login
+#   @driver.find_element(id: "signup_login_button").click
+#   @driver.find_element(id: "signup_determine_email").send_keys @email
+#   @driver.find_element(id: "signup_forms_submit").click
+#   sleep 1
+#   @driver.find_element(id: "signup_password").send_keys @password
+# end
 def login
-  @driver.find_element(id: "signup_login_button").click
-  @driver.find_element(id: "signup_determine_email").send_keys @email
-  @driver.find_element(id: "signup_forms_submit").click
-  sleep 1
-  @driver.find_element(id: "signup_password").send_keys @password
+ unless @driver.page_source.include? @username
+   @driver.find_element(id: "signup_determine_email").send_keys @email
+   @driver.find_element(class: "signup_determine_btn").click
+   password_el = @driver.find_element id: "signup_password"
+   @driver.manage.timeouts.implicit_wait = 1
+   password_el.send_keys "#{@password}\n"
+ end
+end
+
+def browser
+  if @driver
+    @driver.get "http://tumblr.com/logout"
+  else
+    @driver = Selenium::WebDriver.for :chrome
+    @url = "https://tumblr.com/login"
+    @driver.get @url
+  end
+
 end
