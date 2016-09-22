@@ -1,6 +1,7 @@
 require 'rspec'
 require 'selenium-webdriver'
 require 'tumblr_client'
+require 'yaml'
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
@@ -11,18 +12,14 @@ RSpec.configure do |config|
   config.shared_context_metadata_behavior = :apply_to_host_groups
 end
 
-#def delete
-#  delete_url = "https://www.tumblr.com/blog/boldlyspookylady"
-#  @driver.get delete_url
-#  title_check = @driver.find_element class: "post_title"
-#  post_item = @driver.find_element class: "post_control_menu"
-#  post_item.click
-#  delete = @driver.find_element class: "delete"
-#  delete.click
-#  delete_confirm_outer = @driver.find_element class: "init_focus"
-#  delete_confirm = delete_confirm_outer.find_element class: "ui_button"
-#  delete_confirm.click
-#end
+def url(path)
+  'https://www.tumblr.com' + path
+end
+
+def blog_url(username)
+  'http://' + username + '.tumblr.com'
+end
+
 def login
   @driver.find_element(id: "signup_login_button").click
   @driver.find_element(id: "signup_determine_email").send_keys @email

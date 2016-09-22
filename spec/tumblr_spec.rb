@@ -1,4 +1,4 @@
-#describe "Tumblr" do
+# describe "Tumblr" do
 #
 #  before(:all) do
 #    @driver = Selenium::WebDriver.for :chrome
@@ -43,16 +43,21 @@
 #  end
 #
 #
-#end
+# end
 describe "The Tumblr API" do
+
+  @data = YAML.load(File.open("details.yml"))
+
   before(:each) do
     @driver = Selenium::WebDriver.for :chrome
-    @url = "https://tumblr.com"
+    @url = "https://tumblr.com/login"
     @driver.get @url
-    @email = "seitgrads@mailinator.com"
-    @password = "t3stacc0unt16"
+    @email = @data["login_details"]["email"]
+    @password = @data["login_details"]["password"]
     @username = "seitgrads16"
   end
+
+
 
   it 'should log in with correct details' do
     # Try to log in with correct details via UI automation
@@ -140,10 +145,11 @@ describe "The Tumblr API" do
     # Teardown: Delete the post
   end
 
-  it 'should not allow me to post a text post without a title' do
-    # Setup: Login via helper method via UI automation
-    # Create a text post via UI automation, but leave the title blank
-    # Assert that the post button remains disabled
+  it 'should not allow me to post a text post without any inputs' do
+    login
+    @driver.find_element(:class, "icon_post_text").click
+    post_button = @driver.find_element(:class, "button-area").find_element(:class, "create_post_button").find_element(:class, "disabled")
+    assert(post_button)
   end
 
   it 'should post an image post' do
@@ -166,6 +172,6 @@ end
 # 2. Write helper methods to visit the URL of a post on the front end etc
 # 3. Write helper methods to login and logout. Ideally, the login method will only log in if the current session is logged out, and vice versa.
 # 4. Write helper methods to visit the dashboard page of a specific blog and the front-end of a specific blog.
-
+#
 # Bonus points
 # 1. Add some more tests. There's loads of stuff we can test. Different post types, Creating new blogs. etc.
